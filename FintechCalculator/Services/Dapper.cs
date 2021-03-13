@@ -1,11 +1,15 @@
 ﻿using Dapper;
+using FintechCalculator.DataModels;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace FintechCalculator.Services
@@ -29,10 +33,68 @@ namespace FintechCalculator.Services
 			throw new NotImplementedException();
 		}
 
-		public List<T> GetAll<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
+		public ReturnModel GetAll<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
 		{
-			using IDbConnection db = new SqlConnection(_config.GetConnectionString(Connectionstring));
-			return db.Query<T>(sp, parms, commandType: commandType).ToList();
+			var returnMomdel = new ReturnModel();
+			using IDbConnection db =
+				new SqlConnection(_config.GetConnectionString(Connectionstring));
+			//parms = new DynamicParameters();
+
+
+			//parms.Add("@Kind", InvoiceKind.WebInvoice, DbType.Int32, ParameterDirection.Input);
+			//parms.Add("@Code", "Many_Insert_0", DbType.String, ParameterDirection.Input);
+			//parms.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+			int counter = 1;
+			try
+			{
+				for (int i = 0; i < counter; i++)
+				{
+					using (var webClient = new WebClient())
+					{
+						var resp = JsonConvert.DeserializeObject<ReturnModel>(
+							webClient.DownloadString($"https://www.myhome.ge/ka/s/?AdTypeID=1&PrTypeID=5&Page={i}&Ajax=1"));
+						if (i == 0)
+						{
+							counter = Convert.ToInt32(resp.Data.Cnt) % 22 != 0 ? (Convert.ToInt32(resp.Data.Cnt) / 22) + 1
+								: Convert.ToInt32(resp.Data.Cnt) / 22;
+						}
+						if (resp.Data != null)
+							foreach (var item in resp.Data.Prs)
+							{
+								parms.Add("@product_id", item.product_id);
+								parms.Add("@loc_id ", item.loc_id);
+								parms.Add("@street_address", item.street_address);
+								parms.Add("@adtype_id", item.adtype_id);
+								parms.Add("@product_type_id", item.product_type_id);
+								parms.Add("@price", item.price);
+								parms.Add("@area_size_value", item.area_size_value);
+								parms.Add("@currency_id", item.currency_id);
+								parms.Add("@estate_type_id", item.estate_type_id);
+								parms.Add("@area_size", item.area_size);
+								parms.Add("@area_size_type_id", item.area_size_type_id);
+								parms.Add("@map_lat", item.map_lat);
+								parms.Add("@map_lon", item.map_lon);
+								parms.Add("@special_persons", item.special_persons);
+								parms.Add("@bedrooms", item.bedrooms);
+								parms.Add("@floor", item.floor);
+								parms.Add("@parking_id", item.parking_id);
+								parms.Add("@canalization", item.canalization);
+								parms.Add("@water", item.water);
+								parms.Add("@electricity", item.electricity);
+							}
+
+						var resps = Insert<T>(sp, parms, commandType = CommandType.StoredProcedure);
+
+					}
+				}
+
+			}
+			catch (Exception ex)
+			{
+				throw ex;
+			}
+			return returnMomdel;
 		}
 
 		public DbConnection GetDbConnection()

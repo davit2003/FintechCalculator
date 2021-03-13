@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using FintechCalculator.DataModels;
 using FintechCalculator.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,22 +29,22 @@ namespace FintechCalculator.Controllers
 		//        commandType: CommandType.StoredProcedure));
 		//    return result;
 		//}
-		//[HttpGet(nameof(GetById))]
-		//public async Task<Parameters> GetById(int Id)
-		//{
-		//	var result = await Task.FromResult(_dapper.Get<Parameters>($"Select * from [Dummy] where Id = {Id}", null, commandType: CommandType.Text));
-		//	return result;
-		//}
+		[HttpGet(nameof(GetById))]
+		public async Task<MapData> GetById(int Id)
+		{
+			var result = await Task.FromResult(_dapper.GetT<MapData>($"", null, commandType: CommandType.StoredProcedure));
+			return result;
+		}
 		//[HttpDelete(nameof(Delete))]
 		//public async Task<int> Delete(int Id)
 		//{
 		//    var result = await Task.FromResult(_dapper.Execute($"Delete [Dummy] Where Id = {Id}", null, commandType: CommandType.Text));
 		//    return result;
 		//}
-		[HttpGet(nameof(Count))]
-		public Task<List<int>> Count(int num)
+		[HttpGet(nameof(GetAll))]
+		public Task<ReturnModel> GetAll(int num)
 		{
-			var totalcount = Task.FromResult(_dapper.GetAll<int>($"select COUNT(*) from [Dummy] WHERE Age like '%{num}%'", null,
+			var totalcount = Task.FromResult(_dapper.GetAll<ReturnModel>($"spInsertOrUpdateData", null,
 					commandType: CommandType.Text));
 			return totalcount;
 		}
