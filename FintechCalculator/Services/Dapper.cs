@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using FintechCalculator.DataModels;
+using FintechCalculator.Helpers;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -105,6 +107,34 @@ namespace FintechCalculator.Services
 		public T GetT<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
 		{
 			using IDbConnection db = new SqlConnection(_config.GetConnectionString(Connectionstring));
+
+			try
+			{
+				var client = new RestClient("http://maps.napr.gov.ge/NgmapExt/dwr/call/plaincall/JDwrQueryData.autocompliteCombo.dwr");
+				client.Timeout = -1;
+				var request = new RestRequest(Method.POST);
+				request.AddHeader("Content-Type", "text/plain");
+				request.AddHeader("Cookie", "JSESSIONID=699474C2861AF17251DFA95EBDE49E8F");
+				request.AddParameter("text/plain", "callCount=1\r\nwindowName=c0-param0\r\nc0-scriptName=JDwrQueryData\r\nc0-methodName=autocompliteCombo\r\nc0-id=0\r\nc0-e1=string:" + sp + "\r\nc0-e2=string:42.640181640813%2C40.078241357707%2C45.342818359187%2C44.119300947392\r\nc0-param0=Object_Object:{comboValue:reference:c0-e1, mapExtent:reference:c0-e2}\r\nbatchId=17\r\ninstanceId=0\r\npage=%2F\r\nscriptSessionId=icwHq8S5yD2BJ*Skf5wsjTfJIwn/p2dJIwn-Cx1etctUo", ParameterType.RequestBody);
+				IRestResponse response = client.Execute(request);
+				//Console.WriteLine(response.Content);
+				if (response.StatusCode == HttpStatusCode.OK)
+				{
+					CustomReader.GetCoordinates(response.Content);
+				}
+
+
+			}
+			catch (Exception ex)
+			{
+
+				throw;
+			}
+			finally
+			{
+				db.Close();
+			}
+
 			return db.Query<T>(sp, parms, commandType: commandType).FirstOrDefault();
 		}
 		public T Insert<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
