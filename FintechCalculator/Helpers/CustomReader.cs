@@ -27,7 +27,7 @@ namespace FintechCalculator.Helpers
 
 					if (shape_ind == shape_str.Length)
 					{
-						i += 15;
+						i += 14;
 
 						string str_x = "";
 						string str_y = "";
