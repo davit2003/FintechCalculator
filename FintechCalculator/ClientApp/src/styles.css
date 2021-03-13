@@ -1,16 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
-
+*,
+body {
+  margin: 0;
+  padding: 0;
+}
 /* Provide sufficient contrast against white background */
-a {
-  color: #0366d6;
-}
 
-code {
-  color: #e01a76;
+body {
+  background-color: #5F9BCE;
+  height: 100vh;
+  align-items: center;
 }
-
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+.flex {
+  display: flex;
+  justify-content: center;
+  /* align-items: center; */
+}
+.main {
+  width: 90%;
+  height: 90%;
+  background-color: #ffffffcc;
+  border-radius: 20px;
+  box-shadow: 0px 0px 21px -10px;
 }
