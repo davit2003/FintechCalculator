@@ -12,7 +12,7 @@ namespace FintechCalculator.Services
 	public interface IDapper : IDisposable
 	{
 		DbConnection GetDbConnection();
-		double GetT<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure);
+		decimal GetT<T>(MapData mapData, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure);
 		ReturnModel GetAll<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure);
 		int Execute(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure);
 		T Insert<T>(IDbConnection db, string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure);

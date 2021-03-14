@@ -8,12 +8,12 @@ namespace FintechCalculator.Helpers
 	public static class CustomReader
 	{
 		private static string FIELD_NAME = "SHAPE_WKT";
-		private static double CoordToArea = 80;
+		private static double CoordToArea = 96.08;
 
 		// note 1304
 
 		private static int GetCoordsInd(string data)
-        {
+		{
 			int ind = 0;
 
 			for (int i = 0; i < data.Length; i++)
@@ -35,9 +35,9 @@ namespace FintechCalculator.Helpers
 			return -1;
 		}
 
-		public static List <Tuple <double, double>> GetAllCoordinates(string data)
-        {
-			var list = new List <Tuple<double, double>> ();
+		public static List<Tuple<double, double>> GetAllCoordinates(string data)
+		{
+			var list = new List<Tuple<double, double>>();
 			double coord_x = -1, coord_y = -1;
 			int i = GetCoordsInd(data);
 
@@ -48,17 +48,17 @@ namespace FintechCalculator.Helpers
 
 			bool is_x = true;
 
-			while (data[i] != ')')
+			while (true)
 			{
-				if (data[i] == ',')
+				if (data[i] == ',' || data[i] == ')')
 				{
 					coord_y = Convert.ToDouble(str_y);
 
 					is_x = true;
 					str_y = "";
 
-					list.Add(new Tuple <double, double> (coord_x, coord_y));
-
+					list.Add(new Tuple<double, double>(coord_x, coord_y));
+					if (data[i] == ')') goto ret_val;
 					i++;
 				}
 				else if (data[i] == ' ')
@@ -80,27 +80,28 @@ namespace FintechCalculator.Helpers
 				i++;
 			}
 
-			ret_val: return list;
-        }
+		ret_val: return list;
+		}
 
 		public static double CalcArea(string data)
-        {
-			List <Tuple<double, double>> coords = GetAllCoordinates(data);
+		{
+			List<Tuple<double, double>> coords = GetAllCoordinates(data);
 			double area = 0;
 
 			if (coords.Count < 3) goto ret_val;
 
 			for (int i = 0; i < coords.Count; i++)
-            {
+			{
 				area += coords[i].Item1 * coords[(i + 1) % coords.Count].Item2 - coords[(i + 1) % coords.Count].Item1 * coords[i].Item2;
 			}
 
 			area = Math.Abs(area) * .5 * CoordToArea * CoordToArea;
 
-			ret_val: return area;
+		ret_val: return area;
+
 		}
 
-		public static Tuple <double, double> GetCoordinates(string data)
+		public static Tuple<double, double> GetCoordinates(string data)
 		{
 			List<Tuple<double, double>> coords = GetAllCoordinates(data);
 			double coord_x = -1, coord_y = -1;
@@ -110,7 +111,7 @@ namespace FintechCalculator.Helpers
 			coord_x = coords[0].Item1;
 			coord_y = coords[0].Item2;
 
-			ret_val:  return new Tuple <double, double> (coord_x, coord_y);
+		ret_val: return new Tuple<double, double>(coord_x, coord_y);
 		}
 	}
 }

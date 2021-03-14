@@ -110,11 +110,12 @@ namespace FintechCalculator.Services
 			return new SqlConnection(_config.GetConnectionString(Connectionstring));
 		}
 
-		public double GetT<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
+		public decimal GetT<T>(MapData map, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
 		{
 			using IDbConnection db = new SqlConnection(_config.GetConnectionString(Connectionstring));
 			var parameters = new DynamicParameters();
 			var coordinates = new Tuple<double, double>(0, 0);
+			double area = 0;
 			try
 			{
 
@@ -124,19 +125,43 @@ namespace FintechCalculator.Services
 				var request = new RestRequest(Method.POST);
 				request.AddHeader("Content-Type", "text/plain");
 				request.AddHeader("Cookie", "JSESSIONID=699474C2861AF17251DFA95EBDE49E8F");
-				request.AddParameter("text/plain", "callCount=1\r\nwindowName=c0-param0\r\nc0-scriptName=JDwrQueryData\r\nc0-methodName=autocompliteCombo\r\nc0-id=0\r\nc0-e1=string:" + sp + "\r\nc0-e2=string:42.640181640813%2C40.078241357707%2C45.342818359187%2C44.119300947392\r\nc0-param0=Object_Object:{comboValue:reference:c0-e1, mapExtent:reference:c0-e2}\r\nbatchId=17\r\ninstanceId=0\r\npage=%2F\r\nscriptSessionId=icwHq8S5yD2BJ*Skf5wsjTfJIwn/p2dJIwn-Cx1etctUo", ParameterType.RequestBody);
+				request.AddParameter("text/plain", "callCount=1\r\nwindowName=c0-param0\r\nc0-scriptName=JDwrQueryData\r\nc0-methodName=autocompliteCombo\r\nc0-id=0\r\nc0-e1=string:" + map.CadastralCode + "\r\nc0-e2=string:42.640181640813%2C40.078241357707%2C45.342818359187%2C44.119300947392\r\nc0-param0=Object_Object:{comboValue:reference:c0-e1, mapExtent:reference:c0-e2}\r\nbatchId=17\r\ninstanceId=0\r\npage=%2F\r\nscriptSessionId=icwHq8S5yD2BJ*Skf5wsjTfJIwn/p2dJIwn-Cx1etctUo", ParameterType.RequestBody);
 				IRestResponse response = client.Execute(request);
 				//Console.WriteLine(response.Content);
 				if (response.StatusCode == HttpStatusCode.OK)
 				{
 					coordinates = CustomReader.GetCoordinates(response.Content);
+					area = Math.Ceiling(CustomReader.CalcArea(response.Content) * 1000000);
 				}
 
-				parameters.Add("@map_lat", coordinates.Item1);
-				parameters.Add("@map_lon", coordinates.Item2);
-				var res = db.QueryFirstOrDefault<double>("spGetDataByCoordinates", parameters, commandType: CommandType.StoredProcedure);
+				parameters.Add("@map_lat", coordinates.Item2);
+				parameters.Add("@map_lon", coordinates.Item1);
+				parameters.Add("@product_type_id", map.ProductTypeId);
+				parameters.Add("@bedrooms", map.Bedrooms);
+				parameters.Add("@floor", map.Floor);
+				parameters.Add("@road", map.IsRoad);
+				parameters.Add("@electricity", map.Electricity);
+				parameters.Add("@parking_id", map.ParkingId);
+				parameters.Add("@rooms", map.Rooms);
 
-				return res;
+//				
+				var res = db.Query<ReturnResultModel>("spGetDataByCoordinates", parameters, commandType: CommandType.StoredProcedure).ToList();
+
+
+				var newRes = new List<ReturnResultModel>();
+
+				foreach (var item in res)
+				{
+					if (item.price != 0)
+					{
+						newRes.Add(item);
+					}
+				}
+				var returnedResult = res.Count > 1 ? newRes : res;
+
+				var a = returnedResult.Select(x => x.price).Average();
+
+				return a * Convert.ToDecimal(area);
 			}
 			catch (Exception ex)
 			{

@@ -29,10 +29,10 @@ namespace FintechCalculator.Controllers
 		//        commandType: CommandType.StoredProcedure));
 		//    return result;
 		//}
-		[HttpGet(nameof(GetById))]
-		public double GetById([FromHeader] string cadastralCode)
+		[HttpPost(nameof(GetById))]
+		public decimal GetById(MapData mapData)
 		{
-			var result = _dapper.GetT<MapData>(cadastralCode, null, commandType: CommandType.StoredProcedure);
+			var result = _dapper.GetT<MapData>(mapData, null, commandType: CommandType.StoredProcedure);
 			return result;
 		}
 		//[HttpDelete(nameof(Delete))]
