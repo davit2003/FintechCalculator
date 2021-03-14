@@ -8,6 +8,7 @@ namespace FintechCalculator.Helpers
 	public static class CustomReader
 	{
 		private static string FIELD_NAME = "SHAPE_WKT";
+		private static double CoordToArea = 80;
 
 		// note 1304
 
@@ -94,7 +95,7 @@ namespace FintechCalculator.Helpers
 				area += coords[i].Item1 * coords[(i + 1) % coords.Count].Item2 - coords[(i + 1) % coords.Count].Item1 * coords[i].Item2;
 			}
 
-			area = Math.Abs(area) * .5;
+			area = Math.Abs(area) * .5 * CoordToArea * CoordToArea;
 
 			ret_val: return area;
 		}
