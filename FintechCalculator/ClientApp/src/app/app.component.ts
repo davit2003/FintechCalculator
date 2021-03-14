@@ -88,6 +88,12 @@ export class AppComponent implements OnInit {
       }
     );
 
+    this.initializeForm();
+    this.selectedLandType = {
+      id: 8,
+      name: "არ არის არჩეული უძრავი ქონების ტიპი",
+    };
+
 
     // public string CadastralCode { get; set; }
 		// public int? ProductTypeId { get; set; }
