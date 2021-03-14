@@ -23,6 +23,8 @@ export class AppComponent implements OnInit {
   banks = Banks;
   selectedBankTab:string = "credo";
 
+  finalPrice:any;
+
   errorMessage: boolean = false;
   loading: boolean = false;
 
@@ -31,7 +33,7 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log(this.banks[0].name);
+    // console.log(this.banks[0].name);
     this.initializeForm();
   }
 
@@ -70,20 +72,27 @@ export class AppComponent implements OnInit {
       "Rooms": this.form.controls.Rooms.value?this.form.controls.Rooms.value:null
     }
 
-    console.log(mapData);
+    // console.log(mapData);
     this.loanService.calculate(mapData).subscribe(
       (res: any) => {
         this.loading = false;
         this.step = 3;
-        console.log(res);
+        this.finalPrice = res;
+        // console.log(res);
       },
       (err: any) => {
-        console.log(err)
+        // console.log(err)
         this.loading = false; 
         this.errorMessage = true;
         this.step = 3;
       }
     );
+
+    this.initializeForm();
+    this.selectedLandType = {
+      id: 8,
+      name: "არ არის არჩეული უძრავი ქონების ტიპი",
+    };
 
 
     // public string CadastralCode { get; set; }
@@ -143,7 +152,7 @@ export class AppComponent implements OnInit {
   }
 
   selectBank(bank){
-    console.log(bank)
+    // console.log(bank)
     this.selectedBankTab = bank.name;
   }
 }
