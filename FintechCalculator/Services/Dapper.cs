@@ -41,7 +41,7 @@ namespace FintechCalculator.Services
 			using IDbConnection db =
 				new SqlConnection(_config.GetConnectionString(Connectionstring));
 			//parms = new DynamicParameters();
-
+			db.Open();
 
 			//parms.Add("@Kind", InvoiceKind.WebInvoice, DbType.Int32, ParameterDirection.Input);
 			//parms.Add("@Code", "Many_Insert_0", DbType.String, ParameterDirection.Input);
@@ -50,6 +50,7 @@ namespace FintechCalculator.Services
 			int counter = 1;
 			try
 			{
+				var parameters = new DynamicParameters();
 				for (int i = 0; i < counter; i++)
 				{
 					using (var webClient = new WebClient())
@@ -64,29 +65,30 @@ namespace FintechCalculator.Services
 						if (resp.Data != null)
 							foreach (var item in resp.Data.Prs)
 							{
-								parms.Add("@product_id", item.product_id);
-								parms.Add("@loc_id ", item.loc_id);
-								parms.Add("@street_address", item.street_address);
-								parms.Add("@adtype_id", item.adtype_id);
-								parms.Add("@product_type_id", item.product_type_id);
-								parms.Add("@price", item.price);
-								parms.Add("@area_size_value", item.area_size_value);
-								parms.Add("@currency_id", item.currency_id);
-								parms.Add("@estate_type_id", item.estate_type_id);
-								parms.Add("@area_size", item.area_size);
-								parms.Add("@area_size_type_id", item.area_size_type_id);
-								parms.Add("@map_lat", item.map_lat);
-								parms.Add("@map_lon", item.map_lon);
-								parms.Add("@special_persons", item.special_persons);
-								parms.Add("@bedrooms", item.bedrooms);
-								parms.Add("@floor", item.floor);
-								parms.Add("@parking_id", item.parking_id);
-								parms.Add("@canalization", item.canalization);
-								parms.Add("@water", item.water);
-								parms.Add("@electricity", item.electricity);
+								parameters.Add("@product_id", item.product_id);
+								parameters.Add("@loc_id ", item.loc_id);
+								parameters.Add("@street_address", item.street_address);
+								parameters.Add("@adtype_id", item.adtype_id);
+								parameters.Add("@product_type_id", item.product_type_id);
+								parameters.Add("@price", item.price);
+								parameters.Add("@area_size_value", item.area_size_value);
+								parameters.Add("@currency_id", item.currency_id);
+								parameters.Add("@estate_type_id", item.estate_type_id);
+								parameters.Add("@area_size", item.area_size);
+								parameters.Add("@area_size_type_id", item.area_size_type_id);
+								parameters.Add("@map_lat", item.map_lat);
+								parameters.Add("@map_lon", item.map_lon);
+								parameters.Add("@special_persons", item.special_persons);
+								parameters.Add("@bedrooms", item.bedrooms);
+								parameters.Add("@floor", item.floor);
+								parameters.Add("@parking_id", item.parking_id);
+								parameters.Add("@canalization", item.canalization);
+								parameters.Add("@water", item.water);
+								parameters.Add("@electricity", item.electricity);
+
+								var resps = Insert<T>(db, sp, parameters, commandType = CommandType.StoredProcedure);
 							}
 
-						var resps = Insert<T>(sp, parms, commandType = CommandType.StoredProcedure);
 
 					}
 				}
@@ -96,6 +98,10 @@ namespace FintechCalculator.Services
 			{
 				throw ex;
 			}
+			finally
+			{
+				db.Close();
+			}
 			return returnMomdel;
 		}
 
@@ -104,12 +110,15 @@ namespace FintechCalculator.Services
 			return new SqlConnection(_config.GetConnectionString(Connectionstring));
 		}
 
-		public T GetT<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
+		public double GetT<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
 		{
 			using IDbConnection db = new SqlConnection(_config.GetConnectionString(Connectionstring));
-
+			var parameters = new DynamicParameters();
+			var coordinates = new Tuple<double, double>(0, 0);
 			try
 			{
+
+				db.Open();
 				var client = new RestClient("http://maps.napr.gov.ge/NgmapExt/dwr/call/plaincall/JDwrQueryData.autocompliteCombo.dwr");
 				client.Timeout = -1;
 				var request = new RestRequest(Method.POST);
@@ -120,41 +129,46 @@ namespace FintechCalculator.Services
 				//Console.WriteLine(response.Content);
 				if (response.StatusCode == HttpStatusCode.OK)
 				{
-					CustomReader.GetCoordinates(response.Content);
+					coordinates = CustomReader.GetCoordinates(response.Content);
 				}
 
+				parameters.Add("@map_lat", coordinates.Item1);
+				parameters.Add("@map_lon", coordinates.Item2);
+				var res = db.QueryFirstOrDefault<double>("spGetDataByCoordinates", parameters, commandType: CommandType.StoredProcedure);
 
+				return res;
 			}
 			catch (Exception ex)
 			{
 
-				throw;
+				throw ex;
 			}
 			finally
 			{
 				db.Close();
 			}
 
-			return db.Query<T>(sp, parms, commandType: commandType).FirstOrDefault();
+			//return db.Query<T>(sp, parms, commandType: commandType).FirstOrDefault();
+
 		}
-		public T Insert<T>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
+		public T Insert<T>(IDbConnection db, string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
 		{
 			T result;
-			using IDbConnection db = new SqlConnection(_config.GetConnectionString(Connectionstring));
+			//using IDbConnection db = new SqlConnection(_config.GetConnectionString(Connectionstring));
 			try
 			{
-				if (db.State == ConnectionState.Closed)
-					db.Open();
+				//if (db.State == ConnectionState.Closed)
+				//	db.Open();
 
-				using var tran = db.BeginTransaction();
+				//using var tran = db.BeginTransaction();
 				try
 				{
-					result = db.Query<T>(sp, parms, commandType: commandType, transaction: tran).FirstOrDefault();
-					tran.Commit();
+					result = db.Query<T>(sp, parms, commandType: commandType).FirstOrDefault();
+					//tran.Commit();
 				}
 				catch (Exception ex)
 				{
-					tran.Rollback();
+					//tran.Rollback();
 					throw ex;
 				}
 			}
@@ -164,8 +178,8 @@ namespace FintechCalculator.Services
 			}
 			finally
 			{
-				if (db.State == ConnectionState.Open)
-					db.Close();
+				//if (db.State == ConnectionState.Open)
+				//	db.Close();
 			}
 
 			return result;

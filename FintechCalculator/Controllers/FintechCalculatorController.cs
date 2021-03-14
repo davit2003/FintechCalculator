@@ -30,9 +30,9 @@ namespace FintechCalculator.Controllers
 		//    return result;
 		//}
 		[HttpGet(nameof(GetById))]
-		public async Task<MapData> GetById([FromHeader] string cadastralCode)
+		public double GetById([FromHeader] string cadastralCode)
 		{
-			var result = await Task.FromResult(_dapper.GetT<MapData>(cadastralCode, null, commandType: CommandType.StoredProcedure));
+			var result = _dapper.GetT<MapData>(cadastralCode, null, commandType: CommandType.StoredProcedure);
 			return result;
 		}
 		//[HttpDelete(nameof(Delete))]
