@@ -59,14 +59,14 @@ export class AppComponent implements OnInit {
     const mapData = {
       "CadastralCode": this.form.controls.cadNumber.value,
       "ProductTypeId": this.form.controls.landTypeId.value,
-      "IsCanalisation": this.form.controls.IsCanalisation.value?1:0,
-      "IsRoad": this.form.controls.IsRoad.value?1:0,
-      "IsWater": this.form.controls.IsWater.value?1:0,
-      "IsGas": this.form.controls.IsGas.value?1:0,
+      "IsCanalisation": this.form.controls.IsCanalisation.value?1:null,
+      "IsRoad": this.form.controls.IsRoad.value?1:null,
+      "IsWater": this.form.controls.IsWater.value?1:null,
+      "IsGas": this.form.controls.IsGas.value?1:null,
       "Bedrooms": this.form.controls.Bedrooms.value,
       "Floor": this.form.controls.Floor.value,
-      "ParkingId": this.form.controls.ParkingId.value?1:0,
-      "Electricity": this.form.controls.Electricity.value?1:0,
+      "ParkingId": this.form.controls.ParkingId.value?1:null,
+      "Electricity": this.form.controls.Electricity.value?1:null,
       "Rooms": this.form.controls.Rooms.value
     }
 
