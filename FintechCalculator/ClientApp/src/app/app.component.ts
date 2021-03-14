@@ -63,11 +63,11 @@ export class AppComponent implements OnInit {
       "IsRoad": this.form.controls.IsRoad.value?1:null,
       "IsWater": this.form.controls.IsWater.value?1:null,
       "IsGas": this.form.controls.IsGas.value?1:null,
-      "Bedrooms": this.form.controls.Bedrooms.value,
-      "Floor": this.form.controls.Floor.value,
+      "Bedrooms": this.form.controls.Bedrooms.value?this.form.controls.Bedrooms.value:null,
+      "Floor": this.form.controls.Floor.value?this.form.controls.Floor.value:null,
       "ParkingId": this.form.controls.ParkingId.value?1:null,
       "Electricity": this.form.controls.Electricity.value?1:null,
-      "Rooms": this.form.controls.Rooms.value
+      "Rooms": this.form.controls.Rooms.value?this.form.controls.Rooms.value:null
     }
 
     console.log(mapData);
