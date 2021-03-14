@@ -53,7 +53,10 @@
           </p>
           <div class="form-second">
             <div class="inputs-number">
-              <div class="form-input field number">
+              <div
+                class="form-input field number"
+                *ngIf="selectedLandType.name !== 'მიწის ნაკვეთი'"
+              >
                 <!-- room number input -->
                 <input
                   type="number"
@@ -71,8 +74,13 @@
                 </label>
                 <!-- /room number input/ -->
               </div>
-              <div class="form-input field number">
-                <!-- second number input -->
+              <div
+                class="form-input field number"
+                *ngIf="
+                  selectedLandType.name !== 'კომერციული ფართები' &&
+                  selectedLandType.name !== 'მიწის ნაკვეთი'
+                "
+              >
                 <input
                   type="number"
                   class="form-field"
@@ -85,11 +93,17 @@
                   for="Bedrooms"
                   class="form-label font-lower"
                   [ngClass]="{ inputFocus: form.controls.Bedrooms.value }"
-                  >Bedrooms
+                  >საძინებლების რაოდენობა
                 </label>
-                <!-- /second number input/ -->
               </div>
-              <div class="form-input field number">
+              <div
+                class="form-input field number"
+                *ngIf="
+                  selectedLandType.name !== 'სახლები და აგარაკები' &&
+                  selectedLandType.name !== 'მიწის ნაკვეთი' &&
+                  selectedLandType.name !== 'სასტუმროები'
+                "
+              >
                 <!-- second number input -->
                 <input
                   type="number"
@@ -103,7 +117,7 @@
                   for="Floor"
                   class="form-label font-lower"
                   [ngClass]="{ inputFocus: form.controls.Floor.value }"
-                  >Floor
+                  >სართული
                 </label>
                 <!-- /second number input/ -->
               </div>
@@ -111,44 +125,48 @@
 
             <div class="switches flex">
               <div class="switch-element">
-                <input type="checkbox" id="1" formControlName="IsCanalisation" />
+                <input
+                  type="checkbox"
+                  id="1"
+                  formControlName="IsCanalisation"
+                />
                 <label for="1">
-                  <span>IsCanalisation</span>
+                  <span>კანალიზაცია</span>
                   <span></span>
                 </label>
               </div>
               <div class="switch-element">
-                <input type="checkbox" id="2" formControlName="IsRoad"/>
+                <input type="checkbox" id="2" formControlName="IsRoad" />
                 <label for="2">
-                  <span>IsRoad</span>
+                  <span>მისასვლელი გზა</span>
                   <span></span>
                 </label>
               </div>
               <div class="switch-element">
-                <input type="checkbox" id="3" formControlName="IsWater"/>
+                <input type="checkbox" id="3" formControlName="IsWater" />
                 <label for="3">
-                  <span>IsWater</span>
+                  <span>წყალი</span>
                   <span></span>
                 </label>
               </div>
               <div class="switch-element">
-                <input type="checkbox" id="4" formControlName="IsGas"/>
+                <input type="checkbox" id="4" formControlName="IsGas" />
                 <label for="4">
-                  <span>IsGas</span>
+                  <span>გაზი</span>
                   <span></span>
                 </label>
               </div>
               <div class="switch-element">
-                <input type="checkbox" id="5" formControlName="ParkingId"/>
+                <input type="checkbox" id="5" formControlName="ParkingId" />
                 <label for="5">
-                  <span>ParkingId</span>
+                  <span>პარკინგი</span>
                   <span></span>
                 </label>
               </div>
               <div class="switch-element">
-                <input type="checkbox" id="6" formControlName="Electricity"/>
+                <input type="checkbox" id="6" formControlName="Electricity" />
                 <label for="6">
-                  <span>Electricity</span>
+                  <span>ელეკტრო-გაყვანილობა</span>
                   <span></span>
                 </label>
               </div>
@@ -173,39 +191,47 @@
         <div class="final" *ngIf="step === 3">
           <div class="left-final flex" *ngIf="!errorMessage">
             <div class="banks">
-              <div class="bank-element f" [ngClass]="{'selected': selectedBankTab === banks[0].name}" (click)="selectBank(banks[0])">
+              <div class="bank-element selected" (click)="selectBank(banks[0])">
                 <img src="./../assets/imgs/credo.png" />
                 <div class="text">
                   <p class="font-upper">Credo Bank</p>
-                  <p class="rate">200$</p>
+                  <p class="rate">11%</p>
                 </div>
               </div>
-              <div class="bank-element f" [ngClass]="{'selected': selectedBankTab === banks[1].name}" (click)="selectBank(banks[1])">
+              <div class="bank-element selected" (click)="selectBank(banks[1])">
                 <img src="./../assets/imgs/bog.png" />
                 <div class="text">
                   <p class="font-upper">Bank of Georgia</p>
-                  <p class="rate">200$</p>
+                  <p class="rate">12%</p>
                 </div>
               </div>
-              <div class="bank-element f" [ngClass]="{'selected': selectedBankTab === banks[2].name}" (click)="selectBank(banks[2])">
+              <div class="bank-element selected" (click)="selectBank(banks[2])">
                 <img src="./../assets/imgs/tbc.png" />
                 <div class="text">
                   <p class="font-upper">TBC</p>
-                  <p class="rate">200$</p>
+                  <p class="rate">13%</p>
                 </div>
               </div>
-              <div class="bank-element" [ngClass]="{'selected': selectedBankTab === banks[3].name}" (click)="selectBank(banks[3])">
+              <div class="bank-element" (click)="selectBank(banks[3])">
                 <img src="./../assets/imgs/liberty.png" />
                 <div class="text">
                   <p class="font-upper">Liberty Bank</p>
-                  <p class="rate">200$</p>
+                  <p class="rate">14%</p>
                 </div>
               </div>
             </div>
           </div>
           <div class="right-final flex" *ngIf="!errorMessage">
-            <p>title</p>
-            <button class="submit-btn" (click)="backStep()">
+            <div class="final-container">
+              <p class="font-lower finl-text">
+                მიახლოებითი ფასი თქვენი უძრავი ქონების ფართობზე შეადგენს
+              </p>
+              <h2 class="font-upper fina-price">
+                {{ finalPrice | number: "1.2-2" }}$
+              </h2>
+            </div>
+
+            <button class="submit-btn back" (click)="backStep()">
               მთავარზე დაბრუნება
             </button>
           </div>
