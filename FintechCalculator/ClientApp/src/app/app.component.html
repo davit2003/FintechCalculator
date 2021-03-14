@@ -1,8 +1,224 @@
-<body class="flex">
-  <div class="main flex">
-    <div class="header">
-      <h1>იპოთეკური სესხის კალკულატორი</h1>
-      <p>ჩაწერეთ თქვენი ნაკვეთის საკადასტრო ნომერი და ჩვენ დაგითვლით თუ რამხელა თანხის აღება შეგიძლიათ იპოთეკური სესხით</p>
+<form [formGroup]="form">
+  <body class="flex">
+    <div class="main">
+      <div class="header flex">
+        <h1 class="title font-upper">იპოთეკური სესხის კალკულატორი</h1>
+      </div>
+      <div class="form-container">
+        <div class="left flex" *ngIf="step === 1">
+          <p class="sub-title font-lower">
+            ჩაწერეთ თქვენი ნაკვეთის საკადასტრო ნომერი და ჩვენ დაგითვლით თუ
+            რამხელა თანხის აღება შეგიძლიათ იპოთეკური სესხით
+          </p>
+
+          <div class="form-first">
+            <div class="form-input field">
+              <input
+                type="input"
+                class="form-field"
+                placeholder="კადასტრის ნომერი"
+                formControlName="cadNumber"
+                name="cadNumber"
+                id="name"
+                required
+              />
+              <label
+                for="cadNumber"
+                class="form-label font-lower"
+                [ngClass]="{ inputFocus: form.controls.cadNumber.value }"
+                >საკადასტრო ნომერი
+              </label>
+            </div>
+
+            <div class="land-types flex">
+              <div
+                class="land-type"
+                *ngFor="let type of landType"
+                (click)="landTypeClick(type)"
+                [ngClass]="{ 'selected-land-type': type === selectedLandType }"
+              >
+                {{ type.name }}
+              </div>
+            </div>
+
+            <button class="submit-btn" (click)="nextStep()">შემდეგ</button>
+          </div>
+        </div>
+        <div class="left flex" *ngIf="step === 2">
+          <h3 class="font-upper">
+            {{ selectedLandType.name }}
+          </h3>
+          <p class="sub-title font-lower">
+            მონიშნეთ და ჩაწერეთ დამატებითი ველები
+          </p>
+          <div class="form-second">
+            <div class="inputs-number">
+              <div class="form-input field number">
+                <!-- room number input -->
+                <input
+                  type="number"
+                  class="form-field"
+                  placeholder="Rooms"
+                  formControlName="Rooms"
+                  name="Rooms"
+                  id="Rooms"
+                />
+                <label
+                  for="Rooms"
+                  class="form-label font-lower"
+                  [ngClass]="{ inputFocus: form.controls.Rooms.value }"
+                  >ოთახების რაოდენობა
+                </label>
+                <!-- /room number input/ -->
+              </div>
+              <div class="form-input field number">
+                <!-- second number input -->
+                <input
+                  type="number"
+                  class="form-field"
+                  placeholder="Bedrooms"
+                  formControlName="Bedrooms"
+                  name="Bedrooms"
+                  id="Bedrooms"
+                />
+                <label
+                  for="Bedrooms"
+                  class="form-label font-lower"
+                  [ngClass]="{ inputFocus: form.controls.Bedrooms.value }"
+                  >Bedrooms
+                </label>
+                <!-- /second number input/ -->
+              </div>
+              <div class="form-input field number">
+                <!-- second number input -->
+                <input
+                  type="number"
+                  class="form-field"
+                  placeholder="Floor"
+                  formControlName="Floor"
+                  name="Floor"
+                  id="Floor"
+                />
+                <label
+                  for="Floor"
+                  class="form-label font-lower"
+                  [ngClass]="{ inputFocus: form.controls.Floor.value }"
+                  >Floor
+                </label>
+                <!-- /second number input/ -->
+              </div>
+            </div>
+
+            <div class="switches flex">
+              <div class="switch-element">
+                <input type="checkbox" id="1" formControlName="IsCanalisation" />
+                <label for="1">
+                  <span>IsCanalisation</span>
+                  <span></span>
+                </label>
+              </div>
+              <div class="switch-element">
+                <input type="checkbox" id="2" formControlName="IsRoad"/>
+                <label for="2">
+                  <span>IsRoad</span>
+                  <span></span>
+                </label>
+              </div>
+              <div class="switch-element">
+                <input type="checkbox" id="3" formControlName="IsWater"/>
+                <label for="3">
+                  <span>IsWater</span>
+                  <span></span>
+                </label>
+              </div>
+              <div class="switch-element">
+                <input type="checkbox" id="4" formControlName="IsGas"/>
+                <label for="4">
+                  <span>IsGas</span>
+                  <span></span>
+                </label>
+              </div>
+              <div class="switch-element">
+                <input type="checkbox" id="5" formControlName="ParkingId"/>
+                <label for="5">
+                  <span>ParkingId</span>
+                  <span></span>
+                </label>
+              </div>
+              <div class="switch-element">
+                <input type="checkbox" id="6" formControlName="Electricity"/>
+                <label for="6">
+                  <span>Electricity</span>
+                  <span></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="buttons">
+              <button class="secondary-btn" (click)="backStep()">უკან</button>
+              <button class="submit-btn" type="submit" (click)="submitForm()">
+                დათვლა
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="right" *ngIf="step !== 3">
+          <img
+            [src]="'../assets/imgs/' + iconSelect(selectedLandType) + '.svg'"
+            alt=""
+          />
+        </div>
+
+        <div class="final" *ngIf="step === 3">
+          <div class="left-final flex" *ngIf="!errorMessage">
+            <div class="banks">
+              <div class="bank-element f" [ngClass]="{'selected': selectedBankTab === banks[0].name}" (click)="selectBank(banks[0])">
+                <img src="./../assets/imgs/credo.png" />
+                <div class="text">
+                  <p class="font-upper">Credo Bank</p>
+                  <p class="rate">200$</p>
+                </div>
+              </div>
+              <div class="bank-element f" [ngClass]="{'selected': selectedBankTab === banks[1].name}" (click)="selectBank(banks[1])">
+                <img src="./../assets/imgs/bog.png" />
+                <div class="text">
+                  <p class="font-upper">Bank of Georgia</p>
+                  <p class="rate">200$</p>
+                </div>
+              </div>
+              <div class="bank-element f" [ngClass]="{'selected': selectedBankTab === banks[2].name}" (click)="selectBank(banks[2])">
+                <img src="./../assets/imgs/tbc.png" />
+                <div class="text">
+                  <p class="font-upper">TBC</p>
+                  <p class="rate">200$</p>
+                </div>
+              </div>
+              <div class="bank-element" [ngClass]="{'selected': selectedBankTab === banks[3].name}" (click)="selectBank(banks[3])">
+                <img src="./../assets/imgs/liberty.png" />
+                <div class="text">
+                  <p class="font-upper">Liberty Bank</p>
+                  <p class="rate">200$</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="right-final flex" *ngIf="!errorMessage">
+            <p>title</p>
+            <button class="submit-btn" (click)="backStep()">
+              მთავარზე დაბრუნება
+            </button>
+          </div>
+          <div class="errorMessage" *ngIf="errorMessage">
+            <p class="font-lower">მოხდა შეცდომა. ცადეთ მოგვიანებით</p>
+            <button class="submit-btn" (click)="backStep()">
+              მთავარზე დაბრუნება
+            </button>
+          </div>
+        </div>
+
+        <div class="dual-ball" *ngIf="loading"></div>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
+</form>

@@ -4,22 +4,46 @@ body {
   margin: 0;
   padding: 0;
 }
+p{
+  margin: 0;
+  padding: 0;
+}
+/* typo */
+
+.font-lower {
+  font-family: "BPG Nino Elite Round Cond", sans-serif;
+}
+.font-upper {
+  font-family: "BPG Nino Elite Caps", sans-serif;
+}
 /* Provide sufficient contrast against white background */
 
 body {
-  background-color: #5F9BCE;
+  background-image: linear-gradient(to bottom right, #5f9bce, #b1cee7);
   height: 100vh;
   align-items: center;
 }
 .flex {
   display: flex;
   justify-content: center;
-  /* align-items: center; */
 }
-.main {
-  width: 90%;
-  height: 90%;
-  background-color: #ffffffcc;
+
+button{
+  border: none;
+  outline: none;
+}
+
+.dual-ball{
+  background-image: url("./assets/imgs/DualBall.svg");
+  z-index: 10000;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-repeat-x: no-repeat;
+  background-position: center;
+  background-repeat-y: no-repeat;
+  background-color: #a3a9d7;
   border-radius: 20px;
-  box-shadow: 0px 0px 21px -10px;
 }
